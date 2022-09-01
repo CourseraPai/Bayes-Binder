@@ -1,0 +1,74 @@
+---
+title: "Bayes"
+output: html_document
+date: "2022-08-31"
+editor_options: 
+  chunk_output_type: console
+---
+
+# Where are the old left-handed people?
+
+```{r eval=TRUE,echo=FALSE,warning=FALSE,error=FALSE,message=FALSE}
+
+readd(lefthanded_people_plot)
+```
+
+# Rates of left-handedness over time
+
+
+```{r eval=TRUE,echo=FALSE,warning=FALSE,error=FALSE,message=FALSE}
+
+readd(lefthanded_rate_plot)
+```
+
+# When do people normally die?
+
+```{r eval=TRUE,echo=FALSE,warning=FALSE,error=FALSE,message=FALSE}
+
+readd(people_die_plot)
+```
+
+# Plotting the distributions of conditional probabilities
+
+```{r eval=TRUE,echo=FALSE,warning=FALSE,error=FALSE,message=FALSE}
+
+final <- cbind(seq(0,112,by=1),readd(p_A_given_lh),readd(p_A_given_rh) ) 
+names(final) <- c("Age","Left","Right")
+
+final <- final %>% 
+	gather(key,value,-Age) 
+
+final %>% 
+	ggplot(aes(x=Age,y=value,group=key))+
+	geom_line(aes(colour=key),size=1.5)+
+	scale_color_manual(values=c("blue","orange"))
+
+```
+
+
+# Putting it all together
+```{r eval=TRUE,echo=FALSE,warning=FALSE,error=FALSE,message=FALSE}
+final <- cbind(seq(0,112,by=1),readd(p_A_given_lh),readd(p_A_given_rh) ) 
+names(final) <- c("Age","Left","Right")
+
+LeftHanded_Die_Early_by <- final %>% 
+	filter(Age %in% c(6:115)) %>% 
+	mutate(left_sum=(Age*Left),
+	       right_sum=(Age*Right)) %>% 
+	select(left_sum,right_sum) %>% 
+	summarise(left_final=sum(left_sum),
+						right_final=sum(right_sum)) %>% 
+	mutate(left_handed_die_early_by_years=right_final-left_final) %>% 
+	pull()
+
+
+
+print(paste ("Left Handed People Die",LeftHanded_Die_Early_by,"early"))
+
+
+```
+
+
+
+
+
